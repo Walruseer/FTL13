@@ -174,3 +174,18 @@ GLOBAL_VAR_INIT(normal_ooc_colour, OOC_COLOR)
 		to_chat(src, "You can't ignore yourself.")
 		return
 	ignore_key(selection)
+	
+/proc/sanitize(var/t,var/list/repl_chars = null, unicode = 0)
+        t = html_encode(sanitize_simple(t,repl_chars))
+
+        var/index = findtext(t, "____255;")
+        if(unicode)
+                while(index)
+                        t = copytext(t, 1, index) + "я" + copytext(t, index+8)
+                        index = findtext(t, "____255;")
+        else
+                while(index)
+                        t = copytext(t, 1, index) + "ÿ" + copytext(t, index+8)
+                        index = findtext(t, "____255;")
+
+        return t 
