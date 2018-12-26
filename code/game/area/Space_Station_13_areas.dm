@@ -99,6 +99,7 @@ NOTE: there are two lists of areas in the end of this file: centcom and station 
 	dynamic_lighting = DYNAMIC_LIGHTING_ENABLED
 	valid_territory = TRUE
 	has_gravity = 0
+	ambientsounds = list('sound/ambience/ftlamb1.ogg','sound/ambience/ftlamb2.ogg','sound/ambience/ftlamb3.ogg','sound/ambience/ftlamb4.ogg','sound/ambience/ftlamb5.ogg','sound/ambience/ftlamb6.ogg','sound/ambience/ftlamb7.ogg','sound/ambience/ftlamb8.ogg','sound/ambience/ftlamb9.ogg','sound/ambience/ftlamb10.ogg','sound/ambience/ftlamb11.ogg')
 
 /area/shuttle/ftl/space // A special kind of space.
 	name = "Space"
