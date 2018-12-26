@@ -175,17 +175,63 @@ GLOBAL_VAR_INIT(normal_ooc_colour, OOC_COLOR)
 		return
 	ignore_key(selection)
 	
-/proc/sanitize(var/t,var/list/repl_chars = null, unicode = 0)
-        t = html_encode(sanitize_simple(t,repl_chars))
-
-        var/index = findtext(t, "____255;")
-        if(unicode)
+/proc/sanitize_simple(var/t,var/list/repl_chars = list("я"="&#255;", "\n"="#","\t"="#","пїЅ"="пїЅ"))  //Вырезание переносов в хтмл это убого, поэтому всегда заменяем на интерфейсную Я
+        for(var/char in repl_chars)
+                var/index = findtext(t, char)
                 while(index)
-                        t = copytext(t, 1, index) + "я" + copytext(t, index+8)
-                        index = findtext(t, "____255;")
+                        t = copytext(t, 1, index) + repl_chars[char] + copytext(t, index+1)
+                        index = findtext(t, char)
+        return t
+ 
+/proc/sanitize_russian(var/msg, var/html = 0) //Специально для всего, где не нужно убирать переносы строк и прочее.
+        var/rep
+        if(html)
+                rep = "&#x44F;"
         else
-                while(index)
-                        t = copytext(t, 1, index) + "ÿ" + copytext(t, index+8)
-                        index = findtext(t, "____255;")
-
-        return t 
+                rep = "&#255;"
+        var/index = findtext(msg, "я")
+        while(index)
+                msg = copytext(msg, 1, index) + rep + copytext(msg, index + 1)
+                index = findtext(msg, "я")
+        return msg
+ 
+/proc/rhtml_encode(var/msg, var/html = 0)
+        var/rep
+        if(html)
+                rep = "&#x44F;"
+        else
+                rep = "&#255;"
+        var/list/c = text2list(msg, "я")
+        if(c.len == 1)
+                c = text2list(msg, rep)
+                if(c.len == 1)
+                        return html_encode(msg)
+        var/out = ""
+        var/first = 1
+        for(var/text in c)
+                if(!first)
+                        out += rep
+                first = 0
+                out += html_encode(text)
+        return out
+ 
+/proc/rhtml_decode(var/msg, var/html = 0)
+        var/rep
+        if(html)
+                rep = "&#x44F;"
+        else
+                rep = "&#255;"
+        var/list/c = text2list(msg, "я")
+        if(c.len == 1)
+                c = text2list(msg, "&#255;")
+                if(c.len == 1)
+                        c = text2list(msg, "&#x4FF")
+                        if(c.len == 1)
+                                return html_decode(msg)
+        var/out = ""
+        var/first = 1
+        for(var/text in c)
+                if(!first)
+                        out += rep
+                first = 0
+                out += html_decode(text)
